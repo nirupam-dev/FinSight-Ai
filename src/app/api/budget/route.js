@@ -19,13 +19,9 @@ export async function POST(request) {
         const body = await request.json();
         const current = await readData('budget', SEED_BUDGET);
 
-        // If updating income
-        if (body.monthlyIncome !== undefined) {
-            const income = Number(body.monthlyIncome);
-            if (isNaN(income) || income <= 0) {
-                return NextResponse.json({ success: false, error: 'Valid positive income required' }, { status: 400 });
-            }
-            current.config.monthlyIncome = income;
+        // If updating config (income, etc)
+        if (body.config) {
+            current.config = { ...current.config, ...body.config };
         }
 
         // If updating categories
