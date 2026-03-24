@@ -5,7 +5,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AppLayout from '@/components/layout/AppLayout';
 import useStore from '@/store/useStore';
-import { CATEGORIES } from '@/data/mockData';
+const CATEGORIES = [
+    { id: 'food', label: 'Food & Dining', icon: '🍕', color: '#f59e0b' },
+    { id: 'transport', label: 'Transport', icon: '🚗', color: '#3b82f6' },
+    { id: 'shopping', label: 'Shopping', icon: '🛍️', color: '#8b5cf6' },
+    { id: 'bills', label: 'Bills & EMI', icon: '📄', color: '#ef4444' },
+    { id: 'entertainment', label: 'Entertainment', icon: '🎬', color: '#ec4899' },
+    { id: 'health', label: 'Health', icon: '💊', color: '#10b981' },
+    { id: 'travel', label: 'Travel', icon: '✈️', color: '#06b6d4' },
+    { id: 'education', label: 'Education', icon: '📚', color: '#6366f1' },
+    { id: 'groceries', label: 'Groceries', icon: '🥦', color: '#22c55e' },
+    { id: 'other', label: 'Other', icon: '📦', color: '#64748b' },
+];
 import { Plus, Trash2, X, Upload, FileText, Loader2 } from 'lucide-react';
 
 function CustomTooltip({ active, payload, label }) {

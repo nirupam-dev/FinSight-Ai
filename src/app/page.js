@@ -6,11 +6,11 @@ import SpendingChart from '@/components/dashboard/SpendingChart';
 import CategoryDonut from '@/components/dashboard/CategoryDonut';
 import RecentTransactions from '@/components/dashboard/RecentTransactions';
 import useStore from '@/store/useStore';
-import { PORTFOLIO } from '@/data/mockData';
 import { Wallet, Target, PiggyBank, TrendingUp, Loader2 } from 'lucide-react';
 
 export default function DashboardPage() {
   const expenses = useStore((s) => s.expenses);
+  const portfolio = useStore((s) => s.portfolio);
   const loading = useStore((s) => s.loading);
   const getTotalSpent = useStore((s) => s.getTotalSpent);
   const getBudgetRemaining = useStore((s) => s.getBudgetRemaining);
@@ -65,9 +65,9 @@ export default function DashboardPage() {
               <SummaryCard
                 icon={<TrendingUp className="w-4 h-4" />}
                 label="Portfolio Value"
-                value={`₹${PORTFOLIO.totalValue.toLocaleString('en-IN')}`}
-                trend={`${PORTFOLIO.returnsPercent}%`}
-                trendUp={true}
+                value={`₹${portfolio.totalValue.toLocaleString('en-IN')}`}
+                trend={`${portfolio.returnsPercent >= 0 ? '+' : ''}${portfolio.returnsPercent}%`}
+                trendUp={portfolio.returnsPercent >= 0}
                 color="bg-blue-600"
                 delay={0.15}
               />

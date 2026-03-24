@@ -2,10 +2,9 @@
 
 import { motion } from 'framer-motion';
 import useStore from '@/store/useStore';
-import { CATEGORIES } from '@/data/mockData';
-
 export default function RecentTransactions() {
     const expenses = useStore((s) => s.expenses);
+    const budgetCategories = useStore((s) => s.budgetCategories);
     const recent = expenses.slice(0, 8);
 
     return (
@@ -23,18 +22,19 @@ export default function RecentTransactions() {
             </div>
             <div className="space-y-0">
                 {recent.map((tx, i) => {
-                    const cat = CATEGORIES.find((c) => c.id === tx.category);
+                    const cat = budgetCategories.find((c) => c.id === tx.category);
+                    const icon = tx.icon || cat?.icon || '📦';
                     return (
                         <div
                             key={tx.id}
                             className="flex items-center gap-3 py-2.5 border-b border-neutral-100 dark:border-neutral-800 last:border-0"
                         >
                             <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-sm flex-shrink-0">
-                                {cat?.icon || '📦'}
+                                {icon}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-[13px] font-medium text-neutral-900 dark:text-white truncate">{tx.description}</p>
-                                <p className="text-[11px] text-neutral-400">{cat?.label} · {tx.date}</p>
+                                <p className="text-[11px] text-neutral-400">{cat?.label || 'Other'} · {tx.date}</p>
                             </div>
                             <span className="text-[13px] font-medium text-neutral-900 dark:text-white">
                                 -₹{tx.amount.toLocaleString('en-IN')}

@@ -63,7 +63,7 @@ export default function Navbar() {
                         <User className="w-3.5 h-3.5 text-white" />
                     </div>
                     <div className="hidden sm:block">
-                        <p className="text-[13px] font-medium text-neutral-900 dark:text-neutral-100 leading-none">Arjun K.</p>
+                        <p className="text-[13px] font-medium text-neutral-900 dark:text-neutral-100 leading-none">User</p>
                         <p className="text-[11px] text-neutral-400 mt-0.5">Premium</p>
                     </div>
                 </div>

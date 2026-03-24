@@ -95,6 +95,9 @@ const useStore = create((set, get) => ({
     budgetConfig: { monthlyIncome: 85000, needs: 0.50, wants: 0.30, savings: 0.20 },
     budgetCategories: [],
     savingsGoals: [],
+    subscriptions: [],
+    portfolio: { totalValue: 0, returnsPercent: 0, holdings: [] },
+    riskScenarios: [],
     budgetLoaded: false,
 
     fetchBudget: async () => {
@@ -109,6 +112,9 @@ const useStore = create((set, get) => ({
                 budgetConfig: json.data.config,
                 budgetCategories: json.data.categories,
                 savingsGoals: json.data.savingsGoals,
+                subscriptions: json.data.subscriptions || [],
+                portfolio: json.data.portfolio || { totalValue: 0, returnsPercent: 0, holdings: [] },
+                riskScenarios: json.data.riskScenarios || [],
                 budgetLoaded: true,
             });
         } catch (err) {
@@ -119,13 +125,20 @@ const useStore = create((set, get) => ({
     },
 
     setBudgetIncome: async (income) => {
-        const { setLoading, setError, addToast } = get();
+        const { setLoading, setError, addToast, budgetConfig, budgetCategories, savingsGoals, subscriptions, portfolio, riskScenarios } = get();
         setLoading('budget', true);
         try {
             const res = await fetch('/api/budget', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ monthlyIncome: income }),
+                body: JSON.stringify({
+                    config: { ...budgetConfig, monthlyIncome: income },
+                    categories: budgetCategories,
+                    savingsGoals,
+                    subscriptions,
+                    portfolio,
+                    riskScenarios
+                }),
             });
             const json = await res.json();
             if (!json.success) throw new Error(json.error);
@@ -133,8 +146,40 @@ const useStore = create((set, get) => ({
                 budgetConfig: json.data.config,
                 budgetCategories: json.data.categories,
                 savingsGoals: json.data.savingsGoals,
+                subscriptions: json.data.subscriptions || [],
+                portfolio: json.data.portfolio || { totalValue: 0, returnsPercent: 0, holdings: [] },
+                riskScenarios: json.data.riskScenarios || [],
             });
             addToast(`Income updated to ₹${income.toLocaleString('en-IN')}`);
+        } catch (err) {
+            setError('budget', err.message);
+            addToast(err.message, 'error');
+        } finally {
+            setLoading('budget', false);
+        }
+    },
+
+    addGoal: async (goal) => {
+        const { setLoading, setError, addToast, budgetConfig, budgetCategories, savingsGoals, subscriptions, portfolio, riskScenarios } = get();
+        const newGoals = [...savingsGoals, goal];
+        setLoading('budget', true);
+        try {
+            const res = await fetch('/api/budget', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    config: budgetConfig,
+                    categories: budgetCategories,
+                    savingsGoals: newGoals,
+                    subscriptions,
+                    portfolio,
+                    riskScenarios
+                }),
+            });
+            const json = await res.json();
+            if (!json.success) throw new Error(json.error);
+            set({ savingsGoals: json.data.savingsGoals });
+            addToast(`Goal Added: ${goal.label}`);
         } catch (err) {
             setError('budget', err.message);
             addToast(err.message, 'error');

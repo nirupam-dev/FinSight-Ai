@@ -1,21 +1,21 @@
 // ── Seed data used as defaults when no persisted data exists ──
 
 export const SEED_EXPENSES = [
-    { id: 1, description: 'Swiggy Order', amount: 450, category: 'food', date: '2026-03-24', type: 'debit' },
-    { id: 2, description: 'Uber Ride', amount: 280, category: 'transport', date: '2026-03-23', type: 'debit' },
-    { id: 3, description: 'Amazon Purchase', amount: 2499, category: 'shopping', date: '2026-03-22', type: 'debit' },
-    { id: 4, description: 'Electricity Bill', amount: 1850, category: 'bills', date: '2026-03-21', type: 'debit' },
-    { id: 5, description: 'Netflix Subscription', amount: 649, category: 'entertainment', date: '2026-03-20', type: 'debit' },
-    { id: 6, description: 'Gym Membership', amount: 1500, category: 'health', date: '2026-03-19', type: 'debit' },
-    { id: 7, description: 'Zepto Groceries', amount: 1230, category: 'groceries', date: '2026-03-18', type: 'debit' },
-    { id: 8, description: 'Home Loan EMI', amount: 8500, category: 'bills', date: '2026-03-17', type: 'debit' },
-    { id: 9, description: 'Zomato Gold', amount: 320, category: 'food', date: '2026-03-16', type: 'debit' },
-    { id: 10, description: 'Metro Card Recharge', amount: 500, category: 'transport', date: '2026-03-15', type: 'debit' },
-    { id: 11, description: 'Udemy Course', amount: 499, category: 'education', date: '2026-03-14', type: 'debit' },
-    { id: 12, description: 'Myntra Shopping', amount: 3200, category: 'shopping', date: '2026-03-13', type: 'debit' },
-    { id: 13, description: 'Pharmacy', amount: 680, category: 'health', date: '2026-03-12', type: 'debit' },
-    { id: 14, description: 'Petrol', amount: 2100, category: 'transport', date: '2026-03-11', type: 'debit' },
-    { id: 15, description: 'BigBasket Order', amount: 1850, category: 'groceries', date: '2026-03-10', type: 'debit' },
+    { id: 1, description: 'Swiggy Order', amount: 450, category: 'food', date: '2026-03-24', type: 'debit', icon: '🍕' },
+    { id: 2, description: 'Uber Ride', amount: 280, category: 'transport', date: '2026-03-23', type: 'debit', icon: '🚗' },
+    { id: 3, description: 'Amazon Purchase', amount: 2499, category: 'shopping', date: '2026-03-22', type: 'debit', icon: '🛍️' },
+    { id: 4, description: 'Electricity Bill', amount: 1850, category: 'bills', date: '2026-03-21', type: 'debit', icon: '⚡' },
+    { id: 5, description: 'Netflix Subscription', amount: 649, category: 'entertainment', date: '2026-03-20', type: 'debit', icon: '🎬' },
+    { id: 6, description: 'Gym Membership', amount: 1500, category: 'health', date: '2026-03-19', type: 'debit', icon: '💪' },
+    { id: 7, description: 'Zepto Groceries', amount: 1230, category: 'groceries', date: '2026-03-18', type: 'debit', icon: '🛒' },
+    { id: 8, description: 'Home Loan EMI', amount: 8500, category: 'bills', date: '2026-03-17', type: 'debit', icon: '🏠' },
+    { id: 9, description: 'Zomato Gold', amount: 320, category: 'food', date: '2026-03-16', type: 'debit', icon: '🍕' },
+    { id: 10, description: 'Metro Card Recharge', amount: 500, category: 'transport', date: '2026-03-15', type: 'debit', icon: '🚇' },
+    { id: 11, description: 'Udemy Course', amount: 499, category: 'education', date: '2026-03-14', type: 'debit', icon: '📚' },
+    { id: 12, description: 'Myntra Shopping', amount: 3200, category: 'shopping', date: '2026-03-13', type: 'debit', icon: '🛍️' },
+    { id: 13, description: 'Pharmacy', amount: 680, category: 'health', date: '2026-03-12', type: 'debit', icon: '💊' },
+    { id: 14, description: 'Petrol', amount: 2100, category: 'transport', date: '2026-03-11', type: 'debit', icon: '⛽' },
+    { id: 15, description: 'BigBasket Order', amount: 1850, category: 'groceries', date: '2026-03-10', type: 'debit', icon: '🛒' },
 ];
 
 export const SEED_BUDGET = {
@@ -32,10 +32,29 @@ export const SEED_BUDGET = {
         { id: 'education', label: 'Education', allocated: 2500, spent: 499, type: 'wants', color: '#6366f1' },
     ],
     savingsGoals: [
-        { id: 1, label: 'Emergency Fund', target: 300000, saved: 185000, color: '#10b981' },
-        { id: 2, label: 'Vacation Fund', target: 100000, saved: 42000, color: '#3b82f6' },
-        { id: 3, label: 'New Laptop', target: 80000, saved: 65000, color: '#8b5cf6' },
+        { id: 1, label: 'Buy a Car', target: 800000, saved: 220000, targetDate: '2028-06-01', monthlyContribution: 18000, icon: '🚗', category: 'asset', priority: 'high', color: '#3b82f6' },
+        { id: 2, label: 'House Down Payment', target: 2000000, saved: 450000, targetDate: '2030-01-01', monthlyContribution: 30000, icon: '🏠', category: 'asset', priority: 'high', color: '#10b981' },
+        { id: 3, label: 'Emergency Fund', target: 500000, saved: 185000, targetDate: '2027-06-01', monthlyContribution: 20000, icon: '🛡️', category: 'safety', priority: 'high', color: '#f59e0b' },
     ],
+    subscriptions: [
+        { id: 1, name: 'Netflix', amount: 649, category: 'entertainment', frequency: 'monthly', lastCharged: '2026-03-20', active: true, usage: 'low' },
+        { id: 2, name: 'Spotify Premium', amount: 119, category: 'entertainment', frequency: 'monthly', lastCharged: '2026-03-15', active: true, usage: 'high' },
+        { id: 3, name: 'Gym Membership', amount: 1500, category: 'health', frequency: 'monthly', lastCharged: '2026-03-19', active: true, usage: 'low' },
+        { id: 4, name: 'Zomato Gold', amount: 500, category: 'food', frequency: 'monthly', lastCharged: '2026-03-16', active: true, usage: 'low' },
+    ],
+    portfolio: {
+        totalValue: 425000,
+        returnsPercent: +11.84,
+        holdings: [
+            { symbol: 'RELIANCE', name: 'Reliance Industries', qty: 10, avgPrice: 2450, currentPrice: 2950 },
+            { symbol: 'TCS', name: 'Tata Consultancy Services', qty: 5, avgPrice: 3200, currentPrice: 3800 },
+            { symbol: 'INFY', name: 'Infosys', qty: 15, avgPrice: 1550, currentPrice: 1850 },
+        ]
+    },
+    riskScenarios: [
+        { id: 'job_loss', title: 'Job Loss', icon: '💼', description: 'What if you lose your income?', survivalMonths: 4.1, severity: 'warning', recommendation: 'Build emergency fund to cover 6 months.' },
+        { id: 'medical', title: 'Medical Emergency', icon: '🏥', description: 'Unexpected ₹3L medical expense', severity: 'success', recommendation: 'Existing insurance covers most of it.' },
+    ]
 };
 
 export const SEED_UPLOADS = [];

@@ -3,11 +3,15 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppLayout from '@/components/layout/AppLayout';
-import { FINANCIAL_GOALS, calculateSIP, calculateRequiredSIP } from '@/data/advancedData';
-import { Plus, X, Calculator, TrendingUp, Calendar, Flame } from 'lucide-react';
+import useStore from '@/store/useStore';
+import { calculateSIP, calculateRequiredSIP } from '@/lib/analysis';
+import { Plus, X, Calculator, TrendingUp, Calendar, Flame, Loader2 } from 'lucide-react';
 
 export default function GoalsPage() {
-    const [goals, setGoals] = useState(FINANCIAL_GOALS);
+    const savingsGoals = useStore((s) => s.savingsGoals) || [];
+    const addGoal = useStore((s) => s.addGoal);
+    const loading = useStore((s) => s.loading);
+
     const [showForm, setShowForm] = useState(false);
     const [showCalc, setShowCalc] = useState(false);
     const [sipAmount, setSipAmount] = useState(10000);
@@ -18,16 +22,36 @@ export default function GoalsPage() {
     const sipResult = useMemo(() => calculateSIP(sipAmount, sipReturn, sipYears), [sipAmount, sipReturn, sipYears]);
     const totalInvested = sipAmount * sipYears * 12;
 
-    const handleAddGoal = (e) => {
+    const handleAddGoal = async (e) => {
         e.preventDefault();
         if (!form.name || !form.targetAmount) return;
-        setGoals([...goals, { id: Date.now(), name: form.name, targetAmount: Number(form.targetAmount), currentSaved: 0, targetDate: form.targetDate || '2028-01-01', monthlyContribution: Number(form.monthlyContribution) || 5000, icon: form.icon, category: 'custom', priority: 'medium' }]);
+
+        const newGoal = {
+            id: Date.now(),
+            label: form.name,
+            target: Number(form.targetAmount),
+            saved: 0,
+            targetDate: form.targetDate || '2028-01-01',
+            monthlyContribution: Number(form.monthlyContribution) || 5000,
+            icon: form.icon,
+            category: 'custom',
+            priority: 'medium',
+            color: '#6366f1'
+        };
+
+        await addGoal(newGoal);
         setForm({ name: '', targetAmount: '', targetDate: '', icon: '🎯', monthlyContribution: '' });
         setShowForm(false);
     };
 
     const priorityColors = { high: 'text-red-500 bg-red-50 dark:bg-red-900/10', medium: 'text-amber-600 bg-amber-50 dark:bg-amber-900/10', low: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/10' };
     const inputClass = "w-full px-3 py-2 rounded-lg text-[13px] bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all duration-150";
+
+    const sipInputs = [
+        { label: 'Monthly Investment (₹)', min: 1000, max: 100000, step: 1000, val: sipAmount, set: setSipAmount, display: `₹${sipAmount.toLocaleString('en-IN')}` },
+        { label: 'Duration (years)', min: 1, max: 30, step: 1, val: sipYears, set: setSipYears, display: `${sipYears} years` },
+        { label: 'Expected Return (%/year)', min: 6, max: 20, step: 0.5, val: sipReturn, set: setSipReturn, display: `${sipReturn}%` },
+    ];
 
     return (
         <AppLayout>
@@ -50,30 +74,33 @@ export default function GoalsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {goals.map((goal, i) => {
-                        const pct = Math.round((goal.currentSaved / goal.targetAmount) * 100);
-                        const remaining = goal.targetAmount - goal.currentSaved;
-                        const targetDate = new Date(goal.targetDate);
+                    {savingsGoals.length === 0 && (
+                        <div className="lg:col-span-3 py-20 text-center text-neutral-400 text-[13px]">No goals found. Click 'Add Goal' to get started.</div>
+                    )}
+                    {savingsGoals.map((goal, i) => {
+                        const pct = Math.min(100, Math.round(((goal.saved || 0) / (goal.target || 1)) * 100));
+                        const remaining = (goal.target || 0) - (goal.saved || 0);
+                        const targetDate = new Date(goal.targetDate || '2030-01-01');
                         const monthsLeft = Math.max(1, Math.round((targetDate - new Date()) / (1000 * 60 * 60 * 24 * 30)));
                         const requiredSIP = calculateRequiredSIP(remaining, 12, monthsLeft / 12);
-                        const onTrack = goal.monthlyContribution >= requiredSIP;
+                        const onTrack = (goal.monthlyContribution || 0) >= requiredSIP;
 
                         return (
                             <motion.div key={goal.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                                 className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#141414] p-5 flex flex-col">
                                 <div className="flex items-start justify-between mb-3">
                                     <div className="flex items-center gap-2.5">
-                                        <span className="text-xl">{goal.icon}</span>
+                                        <span className="text-xl">{goal.icon || '🎯'}</span>
                                         <div>
-                                            <h3 className="text-[13px] font-semibold text-neutral-900 dark:text-white">{goal.name}</h3>
-                                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${priorityColors[goal.priority]}`}>{goal.priority}</span>
+                                            <h3 className="text-[13px] font-semibold text-neutral-900 dark:text-white">{goal.label || goal.name}</h3>
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${priorityColors[goal.priority || 'medium']}`}>{goal.priority || 'medium'}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="mb-3">
                                     <div className="flex justify-between text-[11px] mb-1">
-                                        <span className="text-neutral-400">₹{goal.currentSaved.toLocaleString('en-IN')} saved</span>
+                                        <span className="text-neutral-400">₹{(goal.saved || 0).toLocaleString('en-IN')} saved</span>
                                         <span className="font-medium text-neutral-900 dark:text-white">{pct}%</span>
                                     </div>
                                     <div className="h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
@@ -83,9 +110,9 @@ export default function GoalsPage() {
                                 </div>
 
                                 <div className="space-y-1 text-[12px] mb-3 flex-1">
-                                    {[['Target', `₹${goal.targetAmount.toLocaleString('en-IN')}`], ['Remaining', `₹${remaining.toLocaleString('en-IN')}`], ['Monthly SIP', `₹${goal.monthlyContribution.toLocaleString('en-IN')}`]].map(([l, v]) => (
-                                        <div key={l} className="flex justify-between"><span className="text-neutral-400">{l}</span><span className="font-medium text-neutral-900 dark:text-white">{v}</span></div>
-                                    ))}
+                                    <div className="flex justify-between"><span className="text-neutral-400">Target</span><span className="font-medium text-neutral-900 dark:text-white">₹{(goal.target || 0).toLocaleString('en-IN')}</span></div>
+                                    <div className="flex justify-between"><span className="text-neutral-400">Remaining</span><span className="font-medium text-neutral-900 dark:text-white">₹{remaining.toLocaleString('en-IN')}</span></div>
+                                    <div className="flex justify-between"><span className="text-neutral-400">Monthly SIP</span><span className="font-medium text-neutral-900 dark:text-white">₹{(goal.monthlyContribution || 0).toLocaleString('en-IN')}</span></div>
                                     <div className="flex justify-between">
                                         <span className="text-neutral-400">Deadline</span>
                                         <span className="font-medium text-neutral-900 dark:text-white flex items-center gap-1"><Calendar className="w-3 h-3" />{targetDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</span>
@@ -111,10 +138,7 @@ export default function GoalsPage() {
                                     <button onClick={() => setShowCalc(false)} className="p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"><X className="w-4 h-4 text-neutral-400" /></button>
                                 </div>
                                 <div className="space-y-5">
-                                    {[{ label: 'Monthly Investment (₹)', min: 1000, max: 100000, step: 1000, val: sipAmount, set: setSipAmount, display: `₹${sipAmount.toLocaleString('en-IN')}` },
-                                    { label: 'Duration (years)', min: 1, max: 30, step: 1, val: sipYears, set: setSipYears, display: `${sipYears} years` },
-                                    { label: 'Expected Return (%/year)', min: 6, max: 20, step: 0.5, val: sipReturn, set: setSipReturn, display: `${sipReturn}%` },
-                                    ].map((s) => (
+                                    {sipInputs.map((s) => (
                                         <div key={s.label}>
                                             <label className="text-[12px] font-medium text-neutral-500 mb-1.5 block">{s.label}</label>
                                             <input type="range" min={s.min} max={s.max} step={s.step} value={s.val} onChange={(e) => s.set(Number(e.target.value))} className="w-full accent-indigo-600" />
@@ -157,7 +181,10 @@ export default function GoalsPage() {
                                         <div><label className="text-[12px] font-medium text-neutral-500 mb-1 block">Monthly SIP (₹)</label><input type="number" value={form.monthlyContribution} onChange={(e) => setForm({ ...form, monthlyContribution: e.target.value })} className={inputClass} placeholder="10000" /></div>
                                     </div>
                                     <div><label className="text-[12px] font-medium text-neutral-500 mb-1 block">Target Date</label><input type="date" value={form.targetDate} onChange={(e) => setForm({ ...form, targetDate: e.target.value })} className={inputClass} /></div>
-                                    <button type="submit" className="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[13px] font-medium transition-colors duration-150">Create Goal</button>
+                                    <button type="submit" disabled={loading.budget} className="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[13px] font-medium transition-colors duration-150 flex items-center justify-center gap-2">
+                                        {loading.budget && <Loader2 className="w-4 h-4 animate-spin" />}
+                                        Create Goal
+                                    </button>
                                 </form>
                             </motion.div>
                         </motion.div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import AppLayout from '@/components/layout/AppLayout';
 import useStore from '@/store/useStore';
-import { SAVINGS_GOALS } from '@/data/mockData';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { AlertTriangle, CheckCircle, IndianRupee, Loader2 } from 'lucide-react';
 
@@ -14,6 +13,7 @@ export default function BudgetPage() {
     const budgetCategories = useStore((s) => s.budgetCategories);
     const savingsGoals = useStore((s) => s.savingsGoals);
     const loading = useStore((s) => s.loading);
+
     const [editIncome, setEditIncome] = useState(false);
     const [incomeValue, setIncomeValue] = useState(budgetConfig.monthlyIncome);
     const [saving, setSaving] = useState(false);
@@ -38,7 +38,7 @@ export default function BudgetPage() {
         setEditIncome(false);
     };
 
-    const displayGoals = savingsGoals.length > 0 ? savingsGoals : SAVINGS_GOALS;
+    const displayGoals = savingsGoals;
 
     return (
         <AppLayout>
